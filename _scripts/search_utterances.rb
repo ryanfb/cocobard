@@ -10,8 +10,6 @@ secrets = JSON.parse(File.read('.secrets.json'))
 client = Twitter::REST::Client.new do |config|
   config.consumer_key        = secrets['consumer_key']
   config.consumer_secret     = secrets['consumer_secret']
-  config.access_token        = secrets['access_token']
-  config.access_token_secret = secrets['access_token_secret']
 end
 
 utterance_tweets = {}
@@ -22,7 +20,9 @@ end
 
 File.foreach("../data/neuraltv-utterances.txt") do |utterance|
   utterance.chomp!
-  unless utterance_tweets.has_key?(utterance)
+  if utterance_tweets.has_key?(utterance)
+    $stderr.puts "skipping: #{utterance}"
+  else
     begin
       search_results = client.search("from:neural_tv \"#{utterance}\"")
       if search_results.count > 0
