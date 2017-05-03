@@ -3,11 +3,21 @@
 
 generate_line = (utterance, utterance_tweets, couplet, line) ->
   if utterance_tweets[utterance]?
-    tweet = 'https://twitter.com/neural_tv/status/' + _.sample(utterance_tweets[utterance])
+    tweet_id = _.sample(utterance_tweets[utterance])
+    tweet = 'https://twitter.com/neural_tv/status/' + tweet_id
     console.log utterance_tweets[utterance]
     console.log tweet
-    link = $('<a>').attr('href',tweet).attr('target','_blank').text(utterance)
-    $("#line_#{couplet}_#{line}").append($('<div>').attr('class','col-xs-12').append(link))
+    $.ajax "https://publish.twitter.com/oembed?url=#{tweet}&omit_script=true&hide_media=false",
+      type: 'GET'
+      dataType: 'jsonp'
+      error: (jqXHR, textStatus, errorThrown) ->
+              console.log "AJAX Error: #{textStatus}"
+      success: (tweet_data) ->
+        link = $('<a>').attr('href',tweet).attr('target','_blank').attr('class','tweet_link').text(utterance)
+        html = $('<div>').attr('class','embedded_tweet').hide().append(tweet_data['html'])
+        $("#line_#{couplet}_#{line}").append($('<div>').attr('class','col-xs-12').append(link))
+        $("#line_#{couplet}_#{line}").append($('<div>').attr('class','col-xs-12').append(html))
+        twttr.widgets.load(document.getElementById("line_#{couplet}_#{line}"))
   else
     $("#line_#{couplet}_#{line}").append($('<div>').attr('class','col-xs-12').append($('<span>').text(utterance)))
 
@@ -54,16 +64,14 @@ $(document).ready ->
   $('#loadingDiv').hide()
   $(document).ajaxStart -> $('#loadingDiv').show()
   $(document).ajaxStop -> $('#loadingDiv').hide()
-  $.ajax 'data/neuraltv-utterances.txt',
+  $('#visualize').click ->
+    $('.tweet_link').toggle()
+    $('.embedded_tweet').toggle()
+    $('#visualize').toggleClass('active')
+  $.ajax 'data/utterance_tweets.json',
     type: 'GET'
-    dataType: 'text'
+    dataType: 'json'
     error: (jqXHR, textStatus, errorThrown) ->
             console.log "AJAX Error: #{textStatus}"
-    success: (data) ->
-      $.ajax 'data/utterance_tweets.json',
-        type: 'GET'
-        dataType: 'json'
-        error: (jqXHR, textStatus, errorThrown) ->
-                console.log "AJAX Error: #{textStatus}"
-        success: (utterance_tweets) ->
-          generate_poem(data.split("\n"), utterance_tweets)
+    success: (utterance_tweets) ->
+      generate_poem(Object.keys(utterance_tweets), utterance_tweets)

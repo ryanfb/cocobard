@@ -7,6 +7,22 @@
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
     <link href="cocobard.css" rel="stylesheet">
+    <script>window.twttr = (function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0],
+        t = window.twttr || {};
+      if (d.getElementById(id)) return t;
+      js = d.createElement(s);
+      js.id = id;
+      js.src = "https://platform.twitter.com/widgets.js";
+      fjs.parentNode.insertBefore(js, fjs);
+
+      t._e = [];
+      t.ready = function(f) {
+        t._e.push(f);
+      };
+
+      return t;
+    }(document, "script", "twitter-wjs"));</script>
     <title>COCObard</title>
 	</head>
 	<body>
@@ -17,6 +33,7 @@
           <ul class="nav nav-pills pull-right">
             <li role="presentation"><a href="https://github.com/ryanfb/cocobard" target="_blank">About</a></li>
             <li role="presentation"><a href="https://ryanfb.github.io/cocobard/">Generate Another Poem</a></li>
+            <li role="presentation" id='visualize'><a href="#">Visualize</a></li>
           </ul>
         </nav>
         <h3 class="text-muted">COCObard</h3>
